@@ -36,20 +36,18 @@
 #include <SFML/System/Err.hpp>
 #include <cassert>
 #include <cstring>
+#include <atomic>
 
 
 namespace
 {
-    sf::Mutex idMutex;
     sf::Mutex maximumSizeMutex;
 
     // Thread-safe unique identifier generator,
     // is used for states cache (see RenderTarget)
     sf::Uint64 getUniqueId()
     {
-        sf::Lock lock(idMutex);
-
-        static sf::Uint64 id = 1; // start at 1, zero is "no texture"
+        static std::atomic<sf::Uint64> id = 1; // start at 1, zero is "no texture"
 
         return id++;
     }
@@ -205,7 +203,7 @@ bool Texture::create(unsigned int width, unsigned int height)
 
     // Initialize the texture
     glCheck(glBindTexture(GL_TEXTURE_2D, m_texture));
-    glCheck(glTexImage2D(GL_TEXTURE_2D, 0, (m_sRgb ? GLEXT_GL_SRGB8_ALPHA8 : GL_RGBA), m_actualSize.x, m_actualSize.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL));
+    glCheck(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_actualSize.x, m_actualSize.y, 0, GL_RGBA, GL_FLOAT, NULL));
     glCheck(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_isRepeated ? GL_REPEAT : (textureEdgeClamp ? GLEXT_GL_CLAMP_TO_EDGE : GLEXT_GL_CLAMP)));
     glCheck(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_isRepeated ? GL_REPEAT : (textureEdgeClamp ? GLEXT_GL_CLAMP_TO_EDGE : GLEXT_GL_CLAMP)));
     glCheck(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_isSmooth ? GL_LINEAR : GL_NEAREST));
@@ -289,7 +287,7 @@ bool Texture::loadFromImage(const Image& image, const IntRect& area)
             glCheck(glBindTexture(GL_TEXTURE_2D, m_texture));
             for (int i = 0; i < rectangle.height; ++i)
             {
-                glCheck(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, i, rectangle.width, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixels));
+                glCheck(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, i, rectangle.width, 1, GL_RGBA, GL_FLOAT, pixels));
                 pixels += 4 * width;
             }
 
@@ -345,7 +343,7 @@ Image Texture::copyToImage() const
 
         glCheck(GLEXT_glBindFramebuffer(GLEXT_GL_FRAMEBUFFER, frameBuffer));
         glCheck(GLEXT_glFramebufferTexture2D(GLEXT_GL_FRAMEBUFFER, GLEXT_GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture, 0));
-        glCheck(glReadPixels(0, 0, m_size.x, m_size.y, GL_RGBA, GL_UNSIGNED_BYTE, &pixels[0]));
+        glCheck(glReadPixels(0, 0, m_size.x, m_size.y, GL_RGBA, GL_FLOAT, &pixels[0]));
         glCheck(GLEXT_glDeleteFramebuffers(1, &frameBuffer));
 
         glCheck(GLEXT_glBindFramebuffer(GLEXT_GL_FRAMEBUFFER, previousFrameBuffer));
@@ -357,7 +355,7 @@ Image Texture::copyToImage() const
     {
         // Texture is not padded nor flipped, we can use a direct copy
         glCheck(glBindTexture(GL_TEXTURE_2D, m_texture));
-        glCheck(glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, &pixels[0]));
+        glCheck(glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, &pixels[0]));
     }
     else
     {
@@ -366,7 +364,7 @@ Image Texture::copyToImage() const
         // All the pixels will first be copied to a temporary array
         std::vector<Uint8> allPixels(m_actualSize.x * m_actualSize.y * 4);
         glCheck(glBindTexture(GL_TEXTURE_2D, m_texture));
-        glCheck(glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, &allPixels[0]));
+        glCheck(glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, &allPixels[0]));
 
         // Then we copy the useful pixels from the temporary array to the final one
         const Uint8* src = &allPixels[0];
@@ -422,7 +420,7 @@ void Texture::update(const Uint8* pixels, unsigned int width, unsigned int heigh
 
         // Copy pixels from the given array to the texture
         glCheck(glBindTexture(GL_TEXTURE_2D, m_texture));
-        glCheck(glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels));
+        glCheck(glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_FLOAT, pixels));
         glCheck(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_isSmooth ? GL_LINEAR : GL_NEAREST));
         m_hasMipmap = false;
         m_pixelsFlipped = false;
