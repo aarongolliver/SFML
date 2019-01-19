@@ -66,10 +66,10 @@ namespace priv
     ////////////////////////////////////////////////////////////
     void copyVector(const Color& source, Vector4<float>& dest)
     {
-        dest.x = source.r / 255.f;
-        dest.y = source.g / 255.f;
-        dest.z = source.b / 255.f;
-        dest.w = source.a / 255.f;
+        dest.x = source.r;
+        dest.y = source.g;
+        dest.z = source.b;
+        dest.w = source.a;
     }
 
 

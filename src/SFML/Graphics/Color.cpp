@@ -34,15 +34,15 @@ namespace sf
 ////////////////////////////////////////////////////////////
 // Static member data
 ////////////////////////////////////////////////////////////
-const Color Color::Black(0, 0, 0);
-const Color Color::White(255, 255, 255);
-const Color Color::Red(255, 0, 0);
-const Color Color::Green(0, 255, 0);
-const Color Color::Blue(0, 0, 255);
-const Color Color::Yellow(255, 255, 0);
-const Color Color::Magenta(255, 0, 255);
-const Color Color::Cyan(0, 255, 255);
-const Color Color::Transparent(0, 0, 0, 0);
+const Color Color::Black(0.f, 0, 0);
+const Color Color::White(1.f, 1, 1);
+const Color Color::Red(1.f, 0, 0);
+const Color Color::Green(0, 1.f, 0);
+const Color Color::Blue(0, 0, 1.f);
+const Color Color::Yellow(1.f, 1.f, 0);
+const Color Color::Magenta(1.f, 0, 1.f);
+const Color Color::Cyan(0, 1.f, 1.f);
+const Color Color::Transparent(0.f, 0, 0, 0);
 
 
 ////////////////////////////////////////////////////////////
@@ -50,39 +50,28 @@ Color::Color() :
 r(0),
 g(0),
 b(0),
-a(255)
+a(1.f)
 {
 
 }
 
 
 ////////////////////////////////////////////////////////////
-Color::Color(Uint8 red, Uint8 green, Uint8 blue, Uint8 alpha) :
-r(red),
-g(green),
-b(blue),
-a(alpha)
+Color::Color(float red, float green, float blue, float alpha) :
+    r(red),
+    g(green),
+    b(blue),
+    a(alpha)
 {
 
 }
 
 
 ////////////////////////////////////////////////////////////
-Color::Color(Uint32 color) :
-r((color & 0xff000000) >> 24),
-g((color & 0x00ff0000) >> 16),
-b((color & 0x0000ff00) >> 8 ),
-a((color & 0x000000ff) >> 0 )
-{
-
-}
 
 
 ////////////////////////////////////////////////////////////
-Uint32 Color::toInteger() const
-{
-    return (r << 24) | (g << 16) | (b << 8) | a;
-}
+
 
 
 ////////////////////////////////////////////////////////////
@@ -105,30 +94,30 @@ bool operator !=(const Color& left, const Color& right)
 ////////////////////////////////////////////////////////////
 Color operator +(const Color& left, const Color& right)
 {
-    return Color(Uint8(std::min(int(left.r) + right.r, 255)),
-                 Uint8(std::min(int(left.g) + right.g, 255)),
-                 Uint8(std::min(int(left.b) + right.b, 255)),
-                 Uint8(std::min(int(left.a) + right.a, 255)));
+    return Color(Uint8(std::min((left.r) + right.r, 1.f)),
+                 Uint8(std::min((left.g) + right.g, 1.f)),
+                 Uint8(std::min((left.b) + right.b, 1.f)),
+                 Uint8(std::min((left.a) + right.a, 1.f)));
 }
 
 
 ////////////////////////////////////////////////////////////
 Color operator -(const Color& left, const Color& right)
 {
-    return Color(Uint8(std::max(int(left.r) - right.r, 0)),
-                 Uint8(std::max(int(left.g) - right.g, 0)),
-                 Uint8(std::max(int(left.b) - right.b, 0)),
-                 Uint8(std::max(int(left.a) - right.a, 0)));
+    return Color(Uint8(std::max((left.r) - right.r, 0.f)),
+                 Uint8(std::max((left.g) - right.g, 0.f)),
+                 Uint8(std::max((left.b) - right.b, 0.f)),
+                 Uint8(std::max((left.a) - right.a, 0.f)));
 }
 
 
 ////////////////////////////////////////////////////////////
 Color operator *(const Color& left, const Color& right)
 {
-    return Color(Uint8(int(left.r) * right.r / 255),
-                 Uint8(int(left.g) * right.g / 255),
-                 Uint8(int(left.b) * right.b / 255),
-                 Uint8(int(left.a) * right.a / 255));
+    return Color(Uint8(int(left.r) * right.r),
+                 Uint8(int(left.g) * right.g),
+                 Uint8(int(left.b) * right.b),
+                 Uint8(int(left.a) * right.a));
 }
 
 

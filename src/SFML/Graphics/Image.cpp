@@ -65,10 +65,10 @@ void Image::create(unsigned int width, unsigned int height, const Color& color)
         Uint8* end = ptr + newPixels.size();
         while (ptr < end)
         {
-            *ptr++ = color.r;
-            *ptr++ = color.g;
-            *ptr++ = color.b;
-            *ptr++ = color.a;
+            *ptr++ = sf::Uint8(color.r * 0xff);
+            *ptr++ = sf::Uint8(color.g * 0xff);
+            *ptr++ = sf::Uint8(color.b * 0xff);
+            *ptr++ = sf::Uint8(color.a * 0xff);
         }
     
         // Commit the new pixel buffer
@@ -263,10 +263,10 @@ void Image::copy(const Image& source, unsigned int destX, unsigned int destY, co
 void Image::setPixel(unsigned int x, unsigned int y, const Color& color)
 {
     Uint8* pixel = &m_pixels[(x + y * m_size.x) * 4];
-    *pixel++ = color.r;
-    *pixel++ = color.g;
-    *pixel++ = color.b;
-    *pixel++ = color.a;
+    *pixel++ = sf::Uint8(color.r * 0xff);
+    *pixel++ = sf::Uint8(color.g * 0xff);
+    *pixel++ = sf::Uint8(color.b * 0xff);
+    *pixel++ = sf::Uint8(color.a * 0xff);
 }
 
 

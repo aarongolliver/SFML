@@ -802,12 +802,12 @@ nextRow(3)
 {
     // Make sure that the texture is initialized by default
     sf::Image image;
-    image.create(128, 128, Color(255, 255, 255, 0));
+    image.create(128, 128, Color(1.f, 1.f, 1.f, 0));
 
     // Reserve a 2x2 white square for texturing underlines
     for (int x = 0; x < 2; ++x)
         for (int y = 0; y < 2; ++y)
-            image.setPixel(x, y, Color(255, 255, 255, 255));
+            image.setPixel(x, y, Color(1.f, 1.f, 1.f, 1.f));
 
     // Create the texture
     texture.loadFromImage(image);
